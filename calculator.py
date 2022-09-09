@@ -13,7 +13,7 @@ root.title("A simple Python Calculator using Tkinter")
 
 def button_click(number):
     value = e.get()
-    if value == "0":
+    if value == "0" and number != ".":
         e.delete(0, END)
     current = e.get()
     e.delete(0, END)
@@ -57,7 +57,13 @@ def sqrt1():
 
 
 def memoryplus():
+    try:
+        value = float(e.get())
+    except ValueError:
+        return
     value = float(e.get())
+    if value / int(value) == 1:
+        value = int(value)
     global memory
     memory += value
     # add memory icon
@@ -68,7 +74,13 @@ def memoryplus():
 
 
 def memoryminus():
+    try:
+        value = float(e.get())
+    except ValueError:
+        return
     value = float(e.get())
+    if value / int(value) == 1:
+        value = int(value)
     global memory
     memory -= value
     # add memory icon
@@ -80,15 +92,12 @@ def memoryminus():
 
 def rclmem():
     global memory
-    try:
+    if e.get()!="":
         value = float(e.get())
         if value == memory:
             memory = 0
             # remove memory icon
             button_memory.grid_forget()
-    except:
-        e.delete(0, END)
-        e.insert(0, memory)
 
     e.delete(0, END)
     e.insert(0, memory)
@@ -127,54 +136,43 @@ def div():
 
 
 def equal(sign):
+    #if no number, just continue
     if e.get() == "":
         return
     # get last number
     list_num.insert(0, e.get())
+
     # clear screen
     e.delete(0, END)
+
     # do the calculations
     if sign == "+":
         result = (float(list_num[1]) + float(list_num[0]))
-        try:
-            result / int(result)
-            if result / int(result) == 1:
-                result = int(result)
-            e.insert(0, result)
-        except:
-            e.insert(0, result)
+        if result / int(result) == 1:
+            result = int(result)
 
     elif sign == "-":
         result = (float(list_num[1]) - float(list_num[0]))
-        try:
-            result / int(result)
-            if result / int(result) == 1:
-                result = int(result)
-                e.insert(0, result)
-        except:
-            e.insert(0, result)
+        if result == 0:
+            e.insert(0, "0")
+            return
+        if result / int(result) == 1:
+            result = int(result)
+
     elif sign == "/":
         if list_num[0] == "0":
             e.insert(0, ("0 division! Try again."))
         else:
             result = (float(list_num[1]) / float(list_num[0]))
-            try:
-                result / int(result)
-                if result / int(result) == 1:
-                    result = int(result)
-                e.insert(0, result)
-            except:
-                e.insert(0, result)
-    elif sign == "*":
-        result = (float(list_num[0]) * float(list_num[1]))
-        try:
-            result / int(result)
             if result / int(result) == 1:
                 result = int(result)
-            e.insert(0, result)
-        except:
-            e.insert(0, result)
 
+    elif sign == "*":
+        result = (float(list_num[0]) * float(list_num[1]))
+        if result / int(result) == 1:
+            result = int(result)
+
+    e.insert(0, round(result,8))
 
 # screen
 e = Entry(root, background="#d3d3d3", font=('Times', '48', 'bold'), width=10, borderwidth=10, justify=tkinter.RIGHT)
