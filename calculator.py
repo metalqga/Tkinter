@@ -148,29 +148,33 @@ def equal(sign):
     # do the calculations
     if sign == "+":
         result = (float(list_num[1]) + float(list_num[0]))
-        if result / int(result) == 1:
-            result = int(result)
+        if result >= 1:
+            if result / int(result) == 1:
+                result = int(result)
 
     elif sign == "-":
         result = (float(list_num[1]) - float(list_num[0]))
         if result == 0:
             e.insert(0, "0")
             return
-        if result / int(result) == 1:
-            result = int(result)
+        if result >= 1:
+            if result / int(result) == 1:
+                result = int(result)
 
     elif sign == "/":
         if list_num[0] == "0":
             e.insert(0, ("0 division! Try again."))
         else:
             result = (float(list_num[1]) / float(list_num[0]))
-            if result / int(result) == 1:
-                result = int(result)
+            if result >=1:
+                if result / int(result) == 1:
+                    result = int(result)
 
     elif sign == "*":
         result = (float(list_num[0]) * float(list_num[1]))
-        if result / int(result) == 1:
-            result = int(result)
+        if result >= 1:
+            if result / int(result) == 1:
+                result = int(result)
 
     e.insert(0, round(result,8))
 
