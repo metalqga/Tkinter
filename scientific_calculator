@@ -5,6 +5,7 @@
 from tkinter import *
 from math import *
 import math
+import re
 
 # global vars
 #default will be in degrees
@@ -24,16 +25,47 @@ root.minsize(490, 720)
 root.maxsize(490, 720)
 root.title("A scientific Python Calculator using Tkinter")
 
+
+#using regex, try using look ahead and grouping regex
+def expression_converter1():
+    return
+    # original_expression = e.get(index1=1.0, index2=END).strip().split("⁣")
+    # print(original_expression)
+    #
+    # # add if clause, if the expression is in parentheses, check if the symbol before the expression and after is a parenth. for sqrt, ^2 ^3 ^x
+    # for i in range(len(original_expression)):
+    #     element = original_expression[i]
+    #     global radian
+    #     if "sin" in element:
+    #         if not radian:
+    #             original_expression[i + 1] = f"radians({original_expression[i + 1]})"
+    #     elif "cos" in element:
+    #         if not radian:
+    #             original_expression[i + 1] = f"radians({original_expression[i + 1]})"
+    #     elif "tan" in element:
+    #         if not radian:
+    #             original_expression[i + 1] = f"radians({original_expression[i + 1]})"
+    # original_expression= "".join(original_expression)
+    # print(original_expression)
+    # regex = r"(?<!\S)A[0-9]+(?:[-+%~^*]+A?\d+(?:\.\d+)?)+(?!\S)"
+    # matches = re.finditer(regex,original_expression)
+    # for match in matches:
+    #     print(match)
+    #
+
+
+
 #using split()
 def expression_converter():
     temp_expression=[]
     final_expression=""
     original_expression = e.get(index1=1.0, index2=END).strip().split("⁣")
-
+    print(original_expression)
+#add if clause, if the expression is in parentheses, check if the symbol before the expression and after is a parenth. for sqrt, ^2 ^3 ^x
     for i in range(len(original_expression)):
         element=original_expression[i]
+        global radian
         if "sin" in element:
-            global radian
             if not radian:
                 original_expression[i+1]= f"radians({original_expression[i+1]})"
         elif "cos" in element:
@@ -49,24 +81,60 @@ def expression_converter():
             original_expression[i + 1]=f"sqrt({original_expression[i + 1]})"
 
         elif "^" in element:
-            original_expression[i + 1]=f"pow({original_expression[i-1]},{original_expression[i + 1]})"
-            original_expression.pop(i-1)
-            original_expression.insert(i-1,"")
-            original_expression.pop(i)
-            original_expression.insert(i,"")
-# broken if expression in parentheses
-        elif "²" in element:
-            original_expression.pop(i)
-            original_expression.insert(i, "")
-            original_expression[i - 1] = f"pow({original_expression[i - 1]},2)"
+            #secure this eval()
+            #add execution of (sin(x))^y
 
-        elif "³" in element:
-            original_expression.pop(i)
-            original_expression.insert(i, "")
-            original_expression[i - 1] = f"pow({original_expression[i - 1]},3)"
+            if original_expression[i-5] == "(" and original_expression[i-1]==")":
+                parenth_eval = eval(f"{original_expression[i - 2]}{original_expression[i-3]}{original_expression[i-4]}")
+                original_expression[i+1] = f"pow({parenth_eval},{original_expression[i + 1]})"
+                original_expression.pop(i-1)
+                original_expression.pop(i-2)
+                original_expression.pop(i-3)
+                original_expression.pop(i-4)
+                original_expression.pop(i-5)
+                original_expression.pop(i-5)
+                original_expression.insert(i-5,"")
+                original_expression.insert(i-5,"")
+                original_expression.insert(i-5,"")
+                original_expression.insert(i-5,"")
+                original_expression.insert(i-5,"")
+                original_expression.insert(i-5,"")
 
-    for element in original_expression:
-        final_expression += element
+            elif original_expression[i-3] in "sin( cos( tan(" and original_expression[i-1]==")":
+                parenth_eval = eval(
+                    f"{original_expression[i - 3]}{original_expression[i - 2]}{original_expression[i - 1]}")
+                original_expression[i + 1] = f"pow({parenth_eval},{original_expression[i + 1]})"
+                original_expression.pop(i)
+                original_expression.insert(i, "")
+                original_expression.pop(i - 1)
+                original_expression.insert(i - 1, "")
+                original_expression.pop(i - 2)
+                original_expression.insert(i - 2, "")
+                original_expression.pop(i - 3)
+                original_expression.insert(i - 3, "")
+
+            else:
+                original_expression[i + 1]=f"pow({original_expression[i-1]},{original_expression[i + 1]})"
+                original_expression.pop(i-1)
+                original_expression.insert(i-1,"")
+                original_expression.pop(i)
+                original_expression.insert(i,"")
+
+
+#run the ^2 and ^3 with the above function
+        # elif "²" in element:
+        #     original_expression.pop(i)
+        #     original_expression.insert(i, "")
+        #     original_expression[i - 1] = f"pow({original_expression[i - 1]},2)"
+        #
+        # elif "³" in element:
+        #     original_expression.pop(i)
+        #     original_expression.insert(i, "")
+        #     original_expression[i - 1] = f"pow({original_expression[i - 1]},3)"
+
+    # for element in original_expression:
+    #     final_expression += element
+    final_expression = "".join(original_expression)
     print(original_expression)
     print(final_expression)
     return final_expression
@@ -74,7 +142,13 @@ def expression_converter():
 
 def expression_evaluator():
     expression = expression_converter()
-    code = compile(expression, "<string>", "eval")
+    try:
+        code = compile(expression, "<string>", "eval")
+    except SyntaxError:
+        result_screen.delete(index1=1.0, index2=END)
+        result_screen.insert(index=1.0, chars=("Syntax Error, try again!"))
+        return
+
     # Validate allowed names
     for name in code.co_names:
         if name not in ALLOWED_NAMES:
@@ -84,6 +158,7 @@ def expression_evaluator():
     result = eval(code, {"__builtins__": {}}, ALLOWED_NAMES)
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(index=1.0, chars=str(result))
+
 
 
 def button_click(number):
@@ -108,36 +183,6 @@ def ce():
     result_screen.delete(index1=1.0, index2=END)
 
 
-def c():
-    # del list_num[1]
-    e.delete(index1=1.0, index2=END)
-
-
-def plusminus():
-    value = float(e.get(index1=1.0, index2=END))
-    try:
-        value / int(value)
-        if value / int(value) == 1:
-            value = int(e.get(index1=1.0, index2=END))
-        e.delete(index1=1.0, index2=END)
-        e.insert(END, (-value))
-    except:
-        e.delete(index1=1.0, index2=END)
-        e.insert(END, (-value))
-
-
-def percentage():
-    value = float(e.get(index1=1.0, index2=END)) * float(list_num[0]) / 100
-    e.delete(index1=1.0, index2=END)
-    e.insert(END, (value))
-
-
-# def sqrt1():
-#     value = sqrt(float(e.get(index1=1.0, index2=END)))
-#     e.delete(index1=1.0, index2=END)
-#     e.insert(END, value)
-
-
 def memoryplus():
     try:
         value = float(result_screen.get(index1=1.0, index2=END))
@@ -151,27 +196,9 @@ def memoryplus():
     memory += value
     # add memory icon
     if memory != 0:
-        button_memory.grid(row=0, column=0)
+        button_memory.grid(row=0, column=5)
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, "0")
-
-
-def memoryminus():
-    try:
-        value = float(e.get(index1=1.0, index2=END))
-    except ValueError:
-        return
-    value = float(e.get(index1=1.0, index2=END))
-    if value >= 1:
-        if value / int(value) == 1:
-            value = int(value)
-    global memory
-    memory -= value
-    # add memory icon
-    if memory != 0:
-        button_memory.grid(row=0, column=0)
-    e.delete(index1=1.0, index2=END)
-    e.insert(END, "0")
 
 
 def rclmem():
@@ -185,35 +212,10 @@ def rclmem():
             # remove memory icon
             button_memory.grid_forget()
     result_screen.delete(index1=1.0, index2=END)
-    result_screen.insert(END, memory)
+    result_screen.insert(END, str(memory))
 
 
-#
-# def sin():
-#     e.insert(END, "sin(")
-#
-#
-# def cos():
-#     e.insert(END, "cos(")
-#
-#
-# def tan():
-#     e.insert(END, "tan(")
-#
-#
-# def power2():
-#     e.insert(END, "²")
-#
-#
-# def power3():
-#     e.insert(END, "³")
-#
-#
-# def powerx():
-#     e.insert(END, "^")
-#
-#
-#x! x-1
+
 def x1():
     e.insert(END, "!")
 
@@ -261,17 +263,17 @@ button_equal = Button(root, text="=", font=('Times', '12', 'bold'), borderwidth=
 # button_clear = Button(root, text = "CLR", font=('Times', '18', 'bold'), borderwidth=5, padx=5, pady=5, command=clear)
 
 # sqrt, mrc, m- m+ % +/- C AC
-button_c = Button(root, text="C", font=('Times', '12', 'bold'), borderwidth=5, padx=22, pady=20, command=c)
+#button_c = Button(root, text="C", font=('Times', '12', 'bold'), borderwidth=5, padx=22, pady=20, command=c)
 button_ac = Button(root, text="AC", font=('Times', '12', 'bold'), borderwidth=5, padx=12, pady=20, command=ce)
 button_del = Button(root, text="DEL", font=('Times', '12', 'bold'), borderwidth=5, padx=10, pady=15, command=delete)
 button_sqrt = Button(root, text="√", font=('Times', '12'), borderwidth=5, padx=26, pady=8, command=lambda: e.insert(END,"√⁣"))
-button_percent = Button(root, text="%", font=('Times', '12', 'bold'), borderwidth=5, padx=18, pady=18,
-                        command=percentage)
+#button_percent = Button(root, text="%", font=('Times', '12', 'bold'), borderwidth=5, padx=18, pady=18,
+#                        command=percentage)
 button_mrc = Button(root, text="MC", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=8, command=rclmem)
-button_mm = Button(root, text="M-", font=('Times', '12', 'bold'), borderwidth=5, padx=10, pady=8, command=memoryminus)
+#button_mm = Button(root, text="M-", font=('Times', '12', 'bold'), borderwidth=5, padx=10, pady=8, command=memoryminus)
 button_mp = Button(root, text="M+", font=('Times', '12', 'bold'), borderwidth=5, padx=4, pady=8, command=memoryplus)
-button_plusminus = Button(root, text="+/-", font=('Times', '12', 'bold'), borderwidth=5, padx=14, pady=20,
-                          command=plusminus)
+#button_plusminus = Button(root, text="+/-", font=('Times', '12', 'bold'), borderwidth=5, padx=14, pady=20,
+#                          command=plusminus)
 
 #special buttons
 
@@ -282,8 +284,8 @@ button_parenth1 = Button(root, text=")", font=('Times', '12', 'bold'), borderwid
 button_sin = Button(root, text="sin", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, "sin(⁣"))
 button_cos = Button(root, text="cos", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, "cos(⁣"))
 button_tan = Button(root, text="tan", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, "tan(⁣"))
-button_power2 = Button(root, text="x²", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("⁣²"))
-button_power3 = Button(root, text="x³", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("⁣³"))
+button_power2 = Button(root, text="x²", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, "⁣^⁣2⁣"))
+button_power3 = Button(root, text="x³", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, "⁣^⁣3⁣"))
 button_shift = Button(root, text="SHIFT", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=shift_click)
 button_alpha = Button(root, text="ALPHA", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 
@@ -303,7 +305,7 @@ button_pol = Button(root, text="Pol(", font=('Times', '12', 'bold'), borderwidth
 button_log = Button(root, text="log", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("log(⁣"))
 button_ln = Button(root, text="ln", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("log10(⁣"))
 button_pi = Button(root, text="π", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("pi"))
-button_ans = Button(root, text="Ans", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=expression_converter)
+button_ans = Button(root, text="Ans", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=expression_converter1)
 button_comma = Button(root, text=",", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, ","))
 button_arrow_l = Button(root, text="<", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_arrow_r = Button(root, text=">", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
