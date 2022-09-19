@@ -84,7 +84,7 @@ def expression_converter():
             #secure this eval()
             #add execution of (sin(x))^y
 
-            if original_expression[i-5] == "(" and original_expression[i-1]==")":
+            if original_expression[i-5] == "(" and original_expression[i-1]==")" and len(original_expression)>=6:
                 parenth_eval = eval(f"{original_expression[i - 2]}{original_expression[i-3]}{original_expression[i-4]}")
                 original_expression[i+1] = f"pow({parenth_eval},{original_expression[i + 1]})"
                 original_expression.pop(i-1)
