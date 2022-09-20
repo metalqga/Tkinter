@@ -2,7 +2,7 @@
 #when you press shift, buttons change make it a function. one function will be normal keys, second function alternative keys
 #add all alternative keys
 #make sin cos tan working again
-
+#add arrows to move the cursor on the evaluation screen
 
 from tkinter import *
 from math import *
@@ -18,6 +18,11 @@ sign = None
 memory = 0
 radian=False
 shift=False
+
+#cursor beginning coordinates
+x = 1.0
+y = 60.0
+
 
 ALLOWED_NAMES = {
     k: v for k, v in math.__dict__.items() if not k.startswith("__")
@@ -236,10 +241,6 @@ def shift_click():
     else:
         button_x11.grid_forget()
         button_x1.grid(row=3, column=0)
-
-
-
-
         button_npr.grid_forget()
         button_ncr.grid(row=3, column=1)
         button_clr.grid_forget()
@@ -276,6 +277,24 @@ def shift_click():
 def randomnum():
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, f"{random.random():.3f}")
+
+
+#TODO
+#bind cursor psn to DEL button
+#update y as per entry screen len()
+def move_cursor(arrow):
+    global x,y
+
+    if arrow == "<":
+        y -= 1.0
+    else:
+        y += 1.0
+    e.mark_set("insert", "%d.%d" % (x, y))
+
+
+def ans():
+    displaying = result_screen.get(index1=1.0, index2=END).strip()
+    e.insert(END, displaying)
 
 
 #start with 0 on screen
@@ -354,10 +373,10 @@ button_pol = Button(root, text="Pol(", font=('Times', '12', 'bold'), borderwidth
 button_log = Button(root, text="log", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("log(⁣"))
 button_ln = Button(root, text="ln", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("log10(⁣"))
 button_pi = Button(root, text="π", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("pi"))
-button_ans = Button(root, text="Ans", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=expression_converter1)
+button_ans = Button(root, text="Ans", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: ans())
 button_comma = Button(root, text=",", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: e.insert(END, ","))
-button_arrow_l = Button(root, text="<", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-button_arrow_r = Button(root, text=">", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
+button_arrow_l = Button(root, text="<", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: move_cursor("<"))
+button_arrow_r = Button(root, text=">", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: move_cursor(">"))
 
 
 #shifted buttons
@@ -376,10 +395,6 @@ button_sto = Button(root, text="STO", font=('Times', '12', 'bold'), borderwidth=
 button_engarrow = Button(root, text="<-", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_ran = Button(root, text="Ran#", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: randomnum())
 button_rnd = Button(root, text="Rnd", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-
-
-
-
 
 
 # screens
