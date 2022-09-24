@@ -2,7 +2,9 @@ from tkinter import *
 from math import *
 import math
 import random
-
+import pyglet
+pyglet.font.add_file('alarm_clock.ttf')
+#then you can use the font as you would normally
 # global vars
 # default will be in degrees
 if_radians = 0
@@ -21,8 +23,8 @@ ALLOWED_NAMES = {
 }
 
 root = Tk()
-root.minsize(420, 720)
-root.maxsize(420, 720)
+root.minsize(420, 680)
+root.maxsize(420, 680)
 root.title("A scientific Python Calculator using Tkinter")
 
 
@@ -458,10 +460,10 @@ button_rnd = Button(root, text="Rnd", font=('Times', '12', 'bold'), borderwidth=
 button_pi = Button(root, text="π", font=('Times', '24', 'bold'), borderwidth=5, padx=6, pady=6,
                    command=lambda: button_click("pi"))
 # input screen
-e = Text(root, background="#d3d3d3", font=('Times', '28', 'bold'), height=2, width=20, borderwidth=10)
+e = Text(root, background="#d3d3d3", font=('alarm clock', '22', 'bold'), height=2, width=21, borderwidth=10)
 e.grid(row=0, column=0, columnspan=10, rowspan=1, padx=10, pady=0)
 # result screen
-result_screen = Text(root, background="#d3d3d3", font=('Times', '32', 'bold'), height=1, width=17, borderwidth=10)
+result_screen = Text(root, background="#d3d3d3", font=('alarm clock', '26', 'bold'), height=1, width=17, borderwidth=10)
 result_screen.grid(row=1, column=0, columnspan=10, rowspan=1, padx=10, pady=0)
 
 # Put buttons on the grid
