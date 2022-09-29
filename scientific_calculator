@@ -5,20 +5,19 @@ import random
 import pyglet
 from py_expression_eval import Parser
 
+
 pyglet.font.add_file('LCDMU___.ttf')
-#then you can use the font as you would normally
+# then you can use the font as you would normally
 # global vars
 # default will be in degrees
 memory = 0
-mode_state=1
-
+mode_state = 1
+shift = 0
 # cursor beginning coordinates
 x = 1.0
 y = 60.0
-
-ALLOWED_NAMES = {
-    k: v for k, v in math.__dict__.items() if not k.startswith("__")
-}
+equations_memory = []
+eq_no = 0
 
 root = Tk()
 root.minsize(420, 720)
@@ -26,11 +25,12 @@ root.maxsize(420, 720)
 root.title("A scientific Python Calculator using Tkinter")
 
 
-#use parser for normal expressions, for log sqrt secure eval
+# use parser for normal expressions, for log sqrt secure eval
 def expression_parser(a=""):
     parser = Parser()
     original_expression = e.get(index1=1.0, index2=END).strip()
-    result = parser.evaluate(original_expression,{})
+    equations_memory.append(original_expression)
+    result = parser.evaluate(original_expression, {})
     print(result)
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(index=1.0, chars=str(result))
@@ -75,6 +75,25 @@ def memoryplus():
     result_screen.tag_add("right", 1.0, "end")
 
 
+def memoryminus():
+    try:
+        value = float(result_screen.get(index1=1.0, index2=END))
+    except ValueError:
+        return
+    value = float(result_screen.get(index1=1.0, index2=END))
+    if value / int(value) == 1:
+        value = int(value)
+    global memory
+    memory -= value
+    # add memory icon
+    if memory != 0:
+        button_memory.grid(row=0, column=0)
+    result_screen.delete(index1=1.0, index2=END)
+    result_screen.insert(END, "0")
+    result_screen.tag_configure("right", justify='right')
+    result_screen.tag_add("right", 1.0, "end")
+
+
 def rclmem():
     global memory
     screen_showing = result_screen.get(index1=1.0, index2=END)
@@ -94,6 +113,7 @@ def rclmem():
 
 def x1():
     e.insert(END, "TODO")
+    print(equations_memory)
 
 
 def shift_click():
@@ -133,6 +153,8 @@ def shift_click():
         button_rnd.grid(row=10, column=0)
         button_exp.grid_forget()
         button_pi.grid(row=10, column=2)
+        button_mp.grid_forget()
+        button_mm.grid(row=6, column=5)
 
     else:
         button_x11.grid_forget()
@@ -169,6 +191,8 @@ def shift_click():
         button_0.grid(row=10, column=0)
         button_pi.grid_forget()
         button_exp.grid(row=10, column=2)
+        button_mm.grid_forget()
+        button_mp.grid(row=6, column=5)
     shift += 1
 
 
@@ -238,7 +262,8 @@ def get_super(digit):
     result = digit.maketrans(''.join(normal_digits), ''.join(super_digits))
     return digit.translate(result)
 
-#rad degr
+
+# rad degr
 def mode():
     global mode_state
     global button_sin
@@ -247,9 +272,9 @@ def mode():
     global button_sin1
     global button_cos1
     global button_tan1
-    mode_state+=1
-    if mode_state%2==0:
-        radian=True
+    mode_state += 1
+    if mode_state % 2 == 0:
+        radian = True
         button_radians.grid(row=2, column=4, sticky=E)
         button_sin = Button(root, text="sin", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                             command=lambda: button_click("sin("))
@@ -267,7 +292,7 @@ def mode():
         button_cos.grid(row=5, column=4)
         button_tan.grid(row=5, column=5)
     else:
-        radian=False
+        radian = False
         button_sin.grid_forget()
         button_cos.grid_forget()
         button_tan.grid_forget()
@@ -282,7 +307,6 @@ def mode():
         button_tan = Button(root, text="tan", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                             command=lambda: button_click("tand("))
 
-
         button_sin1 = Button(root, text="asin", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                              command=lambda: button_click("asind("))
         button_cos1 = Button(root, text="acos", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
@@ -292,8 +316,20 @@ def mode():
         button_sin.grid(row=5, column=3)
         button_cos.grid(row=5, column=4)
         button_tan.grid(row=5, column=5)
+
+
 # start with 0 on screen
 # e.insert(END, "0")
+
+def eq_memory(step):
+    global eq_no
+    e.delete(index1=1.0, index2=END)
+    e.insert(END, str(equations_memory[-1 - eq_no]))
+    eq_no += step
+    if eq_no == len(equations_memory):
+        eq_no = 0
+    elif eq_no<0:
+        eq_no=len(equations_memory)-1
 
 # Define Buttons
 button_1 = Button(root, text="1", font=('Times', '24', 'bold'), borderwidth=5, padx=7, pady=5,
@@ -331,15 +367,15 @@ button_decimal = Button(root, text=".", font=('Times', '12', 'bold'), borderwidt
 button_equal = Button(root, text="=", font=('Times', '12', 'bold'), borderwidth=5, padx=20, pady=20,
                       command=expression_parser)
 
-
 # special buttons
 
 button_ac = Button(root, text="AC", font=('Times', '12', 'bold'), borderwidth=5, padx=15, pady=20, command=ce)
 button_del = Button(root, text="DEL", font=('Times', '12', 'bold'), borderwidth=5, padx=8, pady=20, command=delete)
 button_sqrt = Button(root, text="√", font=('Times', '12'), borderwidth=5, padx=10, pady=10,
-                     command=lambda: e.insert(END, "√"))
+                     command=lambda: e.insert(END, "sqrt("))
 button_mrc = Button(root, text="MC", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=8, command=rclmem)
 button_mp = Button(root, text="M+", font=('Times', '12', 'bold'), borderwidth=5, padx=4, pady=8, command=memoryplus)
+button_mm = Button(root, text="M-", font=('Times', '12', 'bold'), borderwidth=5, padx=10, pady=8, command=memoryminus)
 button_parenth = Button(root, text="(", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                         command=lambda: button_click("("))
 button_parenth1 = Button(root, text=")", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
@@ -353,31 +389,34 @@ button_tan = Button(root, text="tan", font=('Times', '12', 'bold'), borderwidth=
 button_power2 = Button(root, text="x²", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                        command=lambda: button_click("^2"))
 button_power3 = Button(root, text="x³", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                       command=lambda: button_click( "^3"))
+                       command=lambda: button_click("^3"))
 button_shift = Button(root, text="SHIFT", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0,
                       command=shift_click)
-button_alpha = Button(root, text="ALPHA", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0, command=expression_parser)
+button_alpha = Button(root, text="ALPHA", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0,
+                      command=expression_parser)
 button_mode = Button(root, text="MODE", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0, command=mode)
 button_on = Button(root, text="ON", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_x1 = Button(root, text="X(-1)", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                   command=lambda: button_click("^-1"))
+                   command=lambda: button_click("^(-1)"))
 button_x11 = Button(root, text="X!", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                    command=lambda: button_click("factorial("))
+                    command=lambda: button_click("fac("))
 button_cd = Button(root, text="C-D", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_minus_parenth = Button(root, text="(-)", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                               command=lambda: button_click("-"))
 button_rcl = Button(root, text="RCL", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=rclmem)
 button_ncr = Button(root, text="nCr", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-button_degrees = Button(root, text="º'''", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
+button_degrees = Button(root, text="º'''", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                        command=lambda: button_click("º"))
 button_eng = Button(root, text="ENG", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=eng)
 button_hyp = Button(root, text="hyp", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_powerx = Button(root, text="^", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                        command=lambda: button_click("^"))
-button_pol = Button(root, text="Pol(", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("pol("))
+button_pol = Button(root, text="Pol(", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                    command=lambda: button_click("pol("))
 button_log = Button(root, text="log", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                    command=lambda: button_click("log("))
+                    command=lambda: button_click("log( ,10)"))
 button_ln = Button(root, text="ln", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                   command=lambda: button_click("ln("))
+                   command=lambda: button_click("log("))
 
 button_exp = Button(root, text="EXP", font=('Times', '12', 'bold'), borderwidth=5, padx=8, pady=20,
                     command=lambda: button_click("10^"))
@@ -390,22 +429,28 @@ button_arrow_l = Button(root, text="◄", font=('Times', '12', 'bold'), borderwi
 button_arrow_r = Button(root, text="►", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                         command=lambda: move_cursor("►"))
 button_arrow_d = Button(root, text="▼", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                        command=lambda: end_cursor())
+                        command=lambda: eq_memory(-1))
 button_arrow_u = Button(root, text="▲", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
-                        command=lambda: zero_cursor())
+                        command=lambda: eq_memory(1))
 
 # shifted buttons
 button_npr = Button(root, text="nPr", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_clr = Button(root, text="CLR", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-button_rec = Button(root, text="Rec(", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("rec("))
+button_rec = Button(root, text="Rec(", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                    command=lambda: button_click("rec("))
 button_abc = Button(root, text="ab/c", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_sqrtx = Button(root, text="x√", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-button_ex = Button(root, text="e^x", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("E^"))
-button_10x = Button(root, text="10^x", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("10^"))
+button_ex = Button(root, text="e^x", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                   command=lambda: button_click("E^"))
+button_10x = Button(root, text="10^x", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                    command=lambda: button_click("10^"))
 button_arrowdeg = Button(root, text="<-", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
-button_sin1 = Button(root, text="asin", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("asind("))
-button_cos1 = Button(root, text="acos", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("acosd("))
-button_tan1 = Button(root, text="atan", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=lambda: button_click("atand("))
+button_sin1 = Button(root, text="asin", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                     command=lambda: button_click("asind("))
+button_cos1 = Button(root, text="acos", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                     command=lambda: button_click("acosd("))
+button_tan1 = Button(root, text="atan", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
+                     command=lambda: button_click("atand("))
 button_sto = Button(root, text="STO", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_engarrow = Button(root, text="<-", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
 button_ran = Button(root, text="Ran#", font=('Times', '12', 'bold'), borderwidth=5, padx=5, pady=20,
