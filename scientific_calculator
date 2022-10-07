@@ -1,13 +1,12 @@
 from tkinter import *
 from math import *
-import math
 import random
-import pyglet
 from py_expression_eval import Parser
+from fractions import Fraction
 
+#import pyglet
+#pyglet.font.add_file('LCDMU___.ttf')
 
-pyglet.font.add_file('LCDMU___.ttf')
-# then you can use the font as you would normally
 # global vars
 # default will be in degrees
 memory = 0
@@ -30,7 +29,8 @@ def expression_parser(a=""):
     parser = Parser()
     original_expression = e.get(index1=1.0, index2=END).strip()
     equations_memory.append(original_expression)
-    result = parser.evaluate(original_expression, {})
+    result = parser.parse(original_expression).evaluate({})
+    #result = parser.evaluate(original_expression, {})
     print(result)
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(index=1.0, chars=str(result))
@@ -331,6 +331,24 @@ def eq_memory(step):
     elif eq_no<0:
         eq_no=len(equations_memory)-1
 
+
+def on():
+    result_screen.delete(index1=1.0, index2=END)
+    result_screen.insert(END, "0")
+    result_screen.tag_configure("right", justify='right')
+    result_screen.tag_add("right", 1.0, "end")
+
+
+def cd():
+    number=(result_screen.get(index1=1.0, index2=END))
+    fraction=Fraction(number).limit_denominator(10)
+    if True:
+        result_screen.delete(index1=1.0, index2=END)
+        result_screen.insert(END,  f"{fraction}")
+        result_screen.tag_configure("right", justify='right')
+        result_screen.tag_add("right", 1.0, "end")
+
+
 # Define Buttons
 button_1 = Button(root, text="1", font=('Times', '24', 'bold'), borderwidth=5, padx=7, pady=5,
                   command=lambda: button_click(1))
@@ -395,12 +413,12 @@ button_shift = Button(root, text="SHIFT", font=('Times', '10', 'bold'), borderwi
 button_alpha = Button(root, text="ALPHA", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0,
                       command=expression_parser)
 button_mode = Button(root, text="MODE", font=('Times', '10', 'bold'), borderwidth=5, padx=0, pady=0, command=mode)
-button_on = Button(root, text="ON", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
+button_on = Button(root, text="ON", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=on)
 button_x1 = Button(root, text="X(-1)", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                    command=lambda: button_click("^(-1)"))
 button_x11 = Button(root, text="X!", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                     command=lambda: button_click("fac("))
-button_cd = Button(root, text="C-D", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=x1)
+button_cd = Button(root, text="C-D", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=cd)
 button_minus_parenth = Button(root, text="(-)", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0,
                               command=lambda: button_click("-"))
 button_rcl = Button(root, text="RCL", font=('Times', '12', 'bold'), borderwidth=5, padx=0, pady=0, command=rclmem)
@@ -461,6 +479,8 @@ button_pi = Button(root, text="π", font=('Times', '24', 'bold'), borderwidth=5,
 # input screen
 e = Text(root, background="#d3d3d3", font=('Times', '28', 'bold'), height=2, width=20, borderwidth=10)
 e.grid(row=0, column=0, columnspan=10, rowspan=1, padx=10, pady=0)
+#set the cursor blinking in input text box
+e.focus_set()
 # result screen
 result_screen = Text(root, background="#d3d3d3", font=('Times', '32', 'bold'), height=1, width=17, borderwidth=10)
 result_screen.grid(row=1, column=0, columnspan=10, rowspan=1, padx=10, pady=0)
@@ -530,5 +550,6 @@ button_radians = Button(root, text="RAD", font=('Times', '10', 'bold'), backgrou
 
 # evaluate at ENTER key
 root.bind("<KeyPress-Return>", expression_parser)
+
 
 root.mainloop()
