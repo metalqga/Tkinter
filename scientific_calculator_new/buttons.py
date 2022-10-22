@@ -4,7 +4,6 @@ from tkinter import *
 shift = 0
 
 
-
 def shift_click():
     global shift
     if shift % 2 == 0:
@@ -88,7 +87,6 @@ def shift_click():
         button_off.place_forget()
         button_on.place(x=290, y=175)
     shift += 1
-
 
 
 # Define Buttons
@@ -204,7 +202,7 @@ button_npr = Button(root, text="nPr", font=('Times', '12', 'bold'), width=5, bor
 button_clr = Button(root, text="CLR", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
 button_rec = Button(root, text="Rec(", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                     command=lambda: button_click("rec("))
-button_abc = Button(root, text="ab/c", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
+button_abc = Button(root, text="ab/c", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=abc)
 button_sqrtx = Button(root, text="x√", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
 button_ex = Button(root, text="e^x", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                    command=lambda: button_click("E^"))
@@ -232,4 +230,3 @@ button_pi = Button(root, text="π", font=('Times', '12', 'bold'), width=5, borde
 # memory indicator TO refine this indicator
 button_memory = Button(root, text="M", font=('Times', '10', 'bold'), background="white", state=DISABLED)
 button_radians = Button(root, text="RAD", font=('Times', '10', 'bold'), background="white", state=DISABLED)
-
