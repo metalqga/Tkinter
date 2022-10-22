@@ -1,9 +1,4 @@
 from buttons import *
-from functions import expression_parser
-#from my_parser import Parser
-from fractions import Fraction
-#import pyglet
-#pyglet.font.add_file('LCDMU___.ttf')
 
 
 # Put buttons on the grid
@@ -27,7 +22,6 @@ button_minus.grid(row=9, column=4)
 button_ans.grid(row=10, column=3)
 button_exp.grid(row=10, column=2)
 button_equal.grid(row=10, column=4)
-
 
 
 # function keys with PLACE()
@@ -69,6 +63,4 @@ button_mp.place(x=290, y=315)
 
 # evaluate at ENTER key
 root.bind("<KeyPress-Return>", expression_parser)
-
-
 root.mainloop()
