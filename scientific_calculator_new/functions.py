@@ -1,16 +1,14 @@
-
-from py_expression_eval import Parser
 from buttons import *
-# from main import e, result_screen, equations_memory
 from math import *
 import random
 from body import *
 from fractions import Fraction
+from py_expression_eval import Parser
+
 # global vars
 # default will be in degrees
 memory = 0
 mode_state = 1
-
 # cursor beginning coordinates
 x = 1.0
 y = 60.0
@@ -109,8 +107,6 @@ def x1():
     print(equations_memory)
 
 
-
-
 def randomnum():
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, f"{random.random():.3f}")
@@ -167,7 +163,7 @@ def eng():
     displaying = float((result_screen.get(index1=1.0, index2=END).strip()))
     power10 = floor(log10(displaying))
     result_screen.delete(index1=1.0, index2=END)
-    result_screen.insert(END, str(displaying / pow(10, (power10))) + "x10" + get_super(str(power10)))
+    result_screen.insert(END, str(displaying / pow(10, power10)) + "x10" + get_super(str(power10)))
 
 
 # function to convert to superscript
@@ -232,9 +228,6 @@ def mode():
     button_tan.place(x=290, y=280)
 
 
-# start with 0 on screen
-# e.insert(END, "0")
-
 def eq_memory(step):
     global eq_no
     e.delete(index1=1.0, index2=END)
@@ -251,16 +244,6 @@ def on():
     result_screen.insert(END, "0")
     result_screen.tag_configure("right", justify='right')
     result_screen.tag_add("right", 1.0, "end")
-
-
-def cd():
-    number = (result_screen.get(index1=1.0, index2=END))
-    fraction = Fraction(number).limit_denominator(10000000000)
-    if True:
-        result_screen.delete(index1=1.0, index2=END)
-        result_screen.insert(END, f"{fraction}")
-        result_screen.tag_configure("right", justify='right')
-        result_screen.tag_add("right", 1.0, "end")
 
 
 def to_degrees():
@@ -308,3 +291,35 @@ def to_degrees():
             result_screen.insert(END, f"{result}")
             result_screen.tag_configure("right", justify='right')
             result_screen.tag_add("right", 1.0, "end")
+
+
+#from decimal to fraction
+def cd():
+    number = (result_screen.get(index1=1.0, index2=END))
+    fraction = Fraction(number).limit_denominator(10000000000)
+
+    result_screen.delete(index1=1.0, index2=END)
+    result_screen.insert(END, f"{fraction}")
+    result_screen.tag_configure("right", justify='right')
+    result_screen.tag_add("right", 1.0, "end")
+
+
+#from decimal to fraction if whole number
+def abc():
+    number = float(result_screen.get(index1=1.0, index2=END))
+    result_screen.delete(index1=1.0, index2=END)
+    if number > 1:
+        whole = number // 1
+        rest = number - whole
+        fraction = Fraction(rest).limit_denominator(10000000000)
+        result_screen.insert(END, f"{whole:.0f} {fraction}")
+    else:
+        fraction = Fraction(number).limit_denominator(10000000000)
+        result_screen.insert(END, f"{fraction}")
+
+    result_screen.tag_configure("right", justify='right')
+    result_screen.tag_add("right", 1.0, "end")
+
+# memory indicator TO refine this indicator
+button_memory = Button(root, text="M", font=('Times', '10', 'bold'), background="white", state=DISABLED)
+button_radians = Button(root, text="RAD", font=('Times', '10', 'bold'), background="white", state=DISABLED)
