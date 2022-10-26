@@ -6,14 +6,21 @@ from fractions import Fraction
 from py_expression_eval import Parser
 
 # global vars
-# default will be in degrees
+# default will be degrees
 memory = 0
 mode_state = 1
-# cursor beginning coordinates
+# cursor coordinates
 x = 1.0
-y = 60.0
+y = 0
 eq_no = 0
 equations_memory = []
+last_ans = ""
+
+
+def justify_right():
+    # align the result to the right
+    result_screen.tag_configure("right", justify='right')
+    result_screen.tag_add("right", 1.0, "end")
 
 
 def expression_parser(a=""):
@@ -23,24 +30,41 @@ def expression_parser(a=""):
     result = parser.parse(original_expression).evaluate({})
     # result = parser.evaluate(original_expression, {})
     print(result)
+    global last_ans
+    last_ans = str(result)
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(index=1.0, chars=str(result))
     # align the result to the right
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    justify_right()
 
 
 def button_click(number):
+    global x, y
     value = e.get(index1=1.0, index2=END)
     if value == "0" and number != ".":
         e.delete(index1=1.0, index2=END)
-    current = e.get(END)
-    # e.delete(index1=1.0, index2=END)
-    e.insert(END, str(current) + str(number))
+    e.insert("%d.%d" % (x, y), number)
+    y += 1
+
+
+def move_cursor(arrow):
+    global x, y
+    y = int(e.index(INSERT)[2])
+    if arrow == "◄":
+        y -= 1.0
+    else:
+        y += 1.0
+    e.mark_set("insert", "%d.%d" % (x, y))
+
+
+def delete():
+    global x, y
+    e.delete(index1="%d.%d" % (x, y - 1))
+    y -= 1
 
 
 def ce():
-    global list_num
+    #global list_num
     # list_num = []
     e.delete(index1=1.0, index2=END)
     result_screen.delete(index1=1.0, index2=END)
@@ -60,10 +84,7 @@ def memoryplus():
     # add memory icon
     if memory != 0:
         button_memory.grid(row=0, column=0, sticky=NW)
-    result_screen.delete(index1=1.0, index2=END)
-    result_screen.insert(END, "0")
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    # clear_result_screen()
 
 
 def memoryminus():
@@ -79,16 +100,13 @@ def memoryminus():
     # add memory icon
     if memory != 0:
         button_memory.grid(row=0, column=0)
-    result_screen.delete(index1=1.0, index2=END)
-    result_screen.insert(END, "0")
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    # clear_result_screen()
 
 
 def rclmem():
     global memory
     screen_showing = result_screen.get(index1=1.0, index2=END)
-    if screen_showing != "":
+    if screen_showing.strip() != "":
 
         value = float(screen_showing)
         if value == memory:
@@ -98,8 +116,8 @@ def rclmem():
 
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, str(memory))
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    # align the result to the right
+    justify_right()
 
 
 def x1():
@@ -107,55 +125,22 @@ def x1():
     print(equations_memory)
 
 
+# backup of randum function
+# def randomnum():
+#     result_screen.delete(index1=1.0, index2=END)
+#     result_screen.insert(END, f"{random.random():.3f}")
+
+
 def randomnum():
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, f"{random.random():.3f}")
-
-
-# TODO
-# bind cursor psn to DEL button
-# update y as per entry screen len()
-def end_cursor():
-    global x, y
-    screen_showing = e.get(index1=1.0, index2=END)
-    y = len(screen_showing) - 1
-    e.mark_set("insert", "%d.%d" % (x, y))
-
-
-def zero_cursor():
-    global x, y
-    y = 0
-    e.mark_set("insert", "%d.%d" % (x, y))
-
-
-def move_cursor(arrow):
-    global x, y
-    if arrow == "◄":
-        y -= 1.0
-    else:
-        y += 1.0
-    e.mark_set("insert", "%d.%d" % (x, y))
-
-
-def delete():
-    global x, y
-    displaying = e.get(index1=1.0, index2=END)
-    if y == 60:
-        e.delete(index1=1.0, index2=END)
-        e.insert(END, displaying[:-2])
-    else:
-        e.delete(index1=1.0, index2=END)
-        e.insert(END, displaying[:int(y - 1)] + displaying[int(y):].strip())
-        y -= 1
-        if y <= 0:
-            screen_showing = e.get(index1=1.0, index2=END)
-            y = len(screen_showing) - 1
+    # align the result to the right
+    justify_right()
 
 
 def ans():
-    displaying = result_screen.get(index1=1.0, index2=END).strip()
-    e.delete(index1=1.0, index2=END)
-    e.insert(END, displaying)
+    global last_ans
+    e.insert(END, last_ans)
 
 
 # use math.log10(num) to find out the x10 then check the number before that
@@ -239,13 +224,6 @@ def eq_memory(step):
         eq_no = len(equations_memory) - 1
 
 
-def on():
-    result_screen.delete(index1=1.0, index2=END)
-    result_screen.insert(END, "0")
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
-
-
 def to_degrees():
     # to degrees and back to float
     on_screen_result = (result_screen.get(index1=1.0, index2=END))
@@ -260,8 +238,8 @@ def to_degrees():
         result = (f"{int(degs)}º{int(mins)}\'{seconds:.0f}")
         result_screen.delete(index1=1.0, index2=END)
         result_screen.insert(END, f"{result}")
-        result_screen.tag_configure("right", justify='right')
-        result_screen.tag_add("right", 1.0, "end")
+        # align the result to the right
+        justify_right()
     except ValueError:
         degr = result_screen.get(index1=1.0, index2=END).strip()
         if degr == "":
@@ -289,22 +267,22 @@ def to_degrees():
             result = (int(whole_num) + float(seconds_to_float))
             result_screen.delete(index1=1.0, index2=END)
             result_screen.insert(END, f"{result}")
-            result_screen.tag_configure("right", justify='right')
-            result_screen.tag_add("right", 1.0, "end")
+            # align the result to the right
+            justify_right()
 
 
-#from decimal to fraction
+# from decimal to fraction
 def cd():
     number = (result_screen.get(index1=1.0, index2=END))
     fraction = Fraction(number).limit_denominator(10000000000)
 
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, f"{fraction}")
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    # align the result to the right
+    justify_right()
 
 
-#from decimal to fraction if whole number
+# from decimal to fraction if whole number
 def abc():
     number = float(result_screen.get(index1=1.0, index2=END))
     result_screen.delete(index1=1.0, index2=END)
@@ -317,8 +295,24 @@ def abc():
         fraction = Fraction(number).limit_denominator(10000000000)
         result_screen.insert(END, f"{fraction}")
 
-    result_screen.tag_configure("right", justify='right')
-    result_screen.tag_add("right", 1.0, "end")
+    # align the result to the right
+    justify_right()
+
+
+def clear():
+    rclmem()
+    clear_result_screen()
+    e.delete(index1=1.0, index2=END)
+    global equations_memory
+    equations_memory = []
+
+
+def clear_result_screen():
+    result_screen.delete(index1=1.0, index2=END)
+    result_screen.insert(END, "0")
+    # align the result to the right
+    justify_right()
+
 
 # memory indicator TO refine this indicator
 button_memory = Button(root, text="M", font=('Times', '10', 'bold'), background="white", state=DISABLED)
