@@ -46,7 +46,8 @@ def shift_click():
         button_mm.place(x=290, y=315)
         button_on.place_forget()
         button_off.place(x=290, y=175)
-
+        button_parenth.place_forget()
+        button_percent.place(x=113, y=315)
     else:
         button_x11.place_forget()
         button_x1.place(x=0, y=210)
@@ -86,6 +87,8 @@ def shift_click():
         button_mp.place(x=290, y=315)
         button_off.place_forget()
         button_on.place(x=290, y=175)
+        button_percent.place_forget()
+        button_parenth.place(x=113, y=315)
     shift += 1
 
 
@@ -110,7 +113,6 @@ button_9 = Button(root, text="9", font=('Times', '24', 'bold'), borderwidth=5, p
                   command=lambda: button_click(9))
 button_0 = Button(root, text="0", font=('Times', '24', 'bold'), borderwidth=5, padx=7, pady=5,
                   command=lambda: button_click(0))
-
 # + - * / . =  clr
 button_plus = Button(root, text="+", font=('Times', '12', 'bold'), borderwidth=5, padx=20, pady=20,
                      command=lambda: button_click("+"))
@@ -127,7 +129,6 @@ button_equal = Button(root, text="=", font=('Times', '12', 'bold'), borderwidth=
 button_ac = Button(root, text="AC", font=('Times', '12', 'bold'), width=5, borderwidth=5, padx=5, pady=18, command=ce)
 button_del = Button(root, text="DEL", font=('Times', '12', 'bold'), width=5, borderwidth=5, padx=5, pady=18,
                     command=delete)
-
 # special buttons
 button_sqrt = Button(root, text="√", font=('Times', '12'), width=5, borderwidth=1, padx=1, pady=0,
                      command=lambda: button_click("sqrt("))
@@ -157,7 +158,8 @@ button_alpha = Button(root, text="ALPHA", font=('Times', '12', 'bold'), width=5,
                       command=expression_parser)
 button_mode = Button(root, text="MODE", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                      command=mode)
-button_on = Button(root, text="ON", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=on)
+button_on = Button(root, text="ON", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
+                   command=clear_result_screen)
 button_off = Button(root, text="OFF", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                     command=exit)
 button_x1 = Button(root, text="X(-1)", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
@@ -196,13 +198,14 @@ button_arrow_d = Button(root, text="▼", font=('Times', '12', 'bold'), width=5,
                         command=lambda: eq_memory(-1))
 button_arrow_u = Button(root, text="▲", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                         command=lambda: eq_memory(1))
-
 # shifted buttons
 button_npr = Button(root, text="nPr", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
-button_clr = Button(root, text="CLR", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
+button_clr = Button(root, text="CLR", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
+                    command=clear)
 button_rec = Button(root, text="Rec(", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                     command=lambda: button_click("rec("))
-button_abc = Button(root, text="ab/c", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=abc)
+button_abc = Button(root, text="ab/c", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
+                    command=abc)
 button_sqrtx = Button(root, text="x√", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0, command=x1)
 button_ex = Button(root, text="e^x", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
                    command=lambda: button_click("E^"))
@@ -222,11 +225,10 @@ button_engarrow = Button(root, text="<-", font=('Times', '12', 'bold'), width=5,
 button_ran = Button(root, text="Ran#", font=('Times', '12', 'bold'), width=5, borderwidth=5, padx=3, pady=19,
                     command=lambda: randomnum())
 # button_rnd = Button(root, text="Rnd", font=('Times', '12', 'bold'), borderwidth=5, padx=8, pady=20, command=x1)
-
 button_pi = Button(root, text="π", font=('Times', '12', 'bold'), width=5, borderwidth=5, padx=3, pady=19,
                    command=lambda: button_click("PI"))
-
-
+button_percent = Button(root, text="%", font=('Times', '12', 'bold'), width=5, borderwidth=1, padx=0, pady=0,
+                        command=lambda: button_click("/100"))
 # memory indicator TO refine this indicator
 button_memory = Button(root, text="M", font=('Times', '10', 'bold'), background="white", state=DISABLED)
 button_radians = Button(root, text="RAD", font=('Times', '10', 'bold'), background="white", state=DISABLED)
