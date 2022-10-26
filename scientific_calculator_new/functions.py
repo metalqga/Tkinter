@@ -64,8 +64,6 @@ def delete():
 
 
 def ce():
-    #global list_num
-    # list_num = []
     e.delete(index1=1.0, index2=END)
     result_screen.delete(index1=1.0, index2=END)
 
@@ -124,13 +122,7 @@ def x1():
     e.insert(END, "TODO")
     print(equations_memory)
 
-
-# backup of randum function
-# def randomnum():
-#     result_screen.delete(index1=1.0, index2=END)
-#     result_screen.insert(END, f"{random.random():.3f}")
-
-
+#to expand this functionality
 def randomnum():
     result_screen.delete(index1=1.0, index2=END)
     result_screen.insert(END, f"{random.random():.3f}")
@@ -215,13 +207,15 @@ def mode():
 
 def eq_memory(step):
     global eq_no
-    e.delete(index1=1.0, index2=END)
-    e.insert(END, str(equations_memory[-1 - eq_no]))
-    eq_no += step
-    if eq_no == len(equations_memory):
-        eq_no = 0
-    elif eq_no < 0:
-        eq_no = len(equations_memory) - 1
+    global equations_memory
+    if len(equations_memory) > 0:
+        e.delete(index1=1.0, index2=END)
+        e.insert(END, str(equations_memory[-1 - eq_no]))
+        eq_no += step
+        if eq_no == len(equations_memory):
+            eq_no = 0
+        elif eq_no < 0:
+            eq_no = len(equations_memory) - 1
 
 
 def to_degrees():
